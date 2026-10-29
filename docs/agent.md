@@ -4,7 +4,7 @@ Panduan resmi instruksi, aturan arsitektur, dan konteks kerja untuk AI coding ag
 
 ---
 
-## 1. Ikhtisar Proyek (Project Overview)
+## 1. Project Overview
 
 **Geo Entity Manager** adalah platform web untuk memantau dan mengelola objek/aset bergeolokasi (kendaraan, sensor IoT, fasilitas, drone) di atas peta interaktif dengan koordinat WGS 84, klasifikasi tipe dinamis, dan validasi ganda.
 
