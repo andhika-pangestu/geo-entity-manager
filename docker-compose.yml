@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: geo_entity_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-geo_entity_db}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-geo_entity_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend-entity-service:
+    build:
+      context: ./backend-entity-service
+      dockerfile: Dockerfile
+    container_name: geo_entity_service
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PORT: 8080
+      GIN_MODE: release
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_NAME: ${DB_NAME:-geo_entity_db}
+      DB_SSLMODE: disable
+    ports:
+      - "8080:8080"
+
+  frontend-entity-service:
+    build:
+      context: ./frontend-entity-service
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080/api/v1}
+    container_name: geo_entity_web_dashboard
+    restart: unless-stopped
+    depends_on:
+      - backend-entity-service
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:
+    name: geo_entity_postgres_data
+

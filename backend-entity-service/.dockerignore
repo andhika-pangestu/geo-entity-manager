@@ -1,0 +1,8 @@
+vendor
+bin
+geo-entity-server
+.env
+.git
+.DS_Store
+*.out
+
